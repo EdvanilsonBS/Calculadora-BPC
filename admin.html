@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel Admin — Calculadora BPC</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body data-splash-wait>
+
+<div id="splash" class="splash" role="status" aria-label="Carregando">
+  <img src="logo.png" alt="Calculadora BPC" />
+</div>
+
+
+<!-- Tela de "Carregando..." enquanto confirmamos login e permissão -->
+<div id="loading" class="loading-screen">Carregando...</div>
+
+<!-- Conteúdo do painel (escondido até confirmar que a pessoa é admin) -->
+<div id="app" hidden>
+
+  <div class="topbar">
+    <div>
+      <p class="eyebrow">Área restrita</p>
+      <h1>Painel do Administrador</h1>
+    </div>
+    <div class="topbar-actions">
+      <a href="app.html" class="btn-ghost link-btn">Ir para a calculadora</a>
+      <button class="btn-ghost" id="btn-sair" type="button">Sair</button>
+    </div>
+
+    <!-- Celular: botão de 3 risquinhos + painel de opções -->
+    <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-menu" id="nav-menu" aria-label="Menu principal" hidden>
+      <p class="nav-user" id="nav-user"></p>
+      <a href="app.html">Ir para a calculadora</a>
+      <button type="button" class="nav-sair" id="nav-sair">Sair</button>
+    </nav>
+  </div>
+
+  <main class="app-main admin-main">
+
+    <!-- Mensagens gerais do painel -->
+    <p class="form-message error" id="msg-error"></p>
+    <p class="form-message success" id="msg-success"></p>
+
+    <!-- BLOCO 1: criar conta -->
+    <section class="block">
+      <h2>Nova conta</h2>
+      <p class="sub">A conta é criada pronta para uso. Deixe a senha em branco para gerar uma automaticamente.</p>
+
+      <form id="create-user-form" class="admin-form">
+        <div class="field-light">
+          <label for="new-email">E-mail da pessoa</label>
+          <input type="email" id="new-email" placeholder="pessoa@exemplo.com" required />
+        </div>
+        <div class="field-light">
+          <label for="new-password">Senha provisória (opcional)</label>
+          <input type="text" id="new-password" placeholder="mínimo 8 caracteres" minlength="8" />
+        </div>
+        <div class="field-light">
+          <label for="new-role">Papel</label>
+          <select id="new-role">
+            <option value="user">Usuário (só a calculadora)</option>
+            <option value="admin">Administrador (também acessa este painel)</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn-calc" id="submit-btn">Criar conta</button>
+          <button type="button" class="btn-clear" id="gerar-senha-btn">Gerar senha</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- BLOCO 2: lista de membros -->
+    <section class="block members-block">
+      <h2>Membros</h2>
+      <p class="sub" id="members-count">Carregando lista...</p>
+
+      <div class="table-wrap">
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th>E-mail</th>
+              <th>Papel</th>
+              <th>Criado em</th>
+              <th></th>
+            </tr>
+          </thead>
+          <!-- As linhas são criadas pelo admin.js -->
+          <tbody id="members-body"></tbody>
+        </table>
+      </div>
+      <p class="sub" style="margin-top:12px;">
+        Dica: na planilha, a coluna <strong>ativo</strong> (SIM/NAO) liga e desliga o acesso de alguém sem excluir a conta.
+      </p>
+    </section>
+  </main>
+</div>
+
+<!-- Mostrado para quem está logado mas não é admin -->
+<div id="acesso-negado" class="denied" hidden>
+  <p class="denied-title">Acesso restrito</p>
+  <p class="denied-text">Sua conta não tem permissão de administrador.</p>
+  <a href="app.html" class="denied-link">Voltar para a calculadora</a>
+</div>
+
+<script src="splash.js"></script>
+<script src="nav.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

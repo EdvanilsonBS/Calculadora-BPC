@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calculadora BPC</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body data-splash-wait>
+
+<div id="splash" class="splash" role="status" aria-label="Carregando">
+  <img src="logo.png" alt="Calculadora BPC" />
+</div>
+
+
+<!-- Tela de carregamento: some quando o login é confirmado (ver app.js) -->
+<div id="loading" class="loading-screen">Carregando...</div>
+
+<!-- Conteúdo principal, escondido até confirmar que há alguém logado -->
+<div id="app" hidden>
+
+  <!-- Barra superior -->
+  <div class="topbar">
+    <div>
+      <p class="eyebrow">Res. CNJ nº 630/2025 · Anexo IV</p>
+      <h1>Calculadora do Instrumento Unificado de Avaliação Biopsicossocial</h1>
+      <!-- (Removido: havia aqui um botão quebrado "<button link href=...>" visível a todos.
+           O acesso ao admin é só o link "Painel Admin" ao lado.) -->
+    </div>
+    <div class="topbar-actions">
+      <!-- Só aparece para administradores (o app.js remove o "hidden") -->
+      <a href="admin.html" class="btn-ghost link-btn" id="link-admin" hidden>Painel Admin</a>
+      <!-- Círculo com as 2 primeiras letras do e-mail -->
+      <div class="avatar" id="avatar">–</div>
+      <button class="btn-ghost" id="btn-sair" type="button">Sair</button>
+    </div>
+
+    <!-- Celular: botão de 3 risquinhos + painel de opções (ver nav.js e styles.css, seção 8) -->
+    <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-menu" id="nav-menu" aria-label="Menu principal" hidden>
+      <p class="nav-user" id="nav-user"></p>
+      <button type="button" data-go="menu-inicial">Início</button>
+      <button type="button" data-go="view-ambientais">Fatores Ambientais</button>
+      <button type="button" data-go="view-participacao">Atividades e Participação</button>
+      <a href="admin.html" id="nav-admin" hidden>Painel Admin</a>
+      <button type="button" class="nav-sair" id="nav-sair">Sair</button>
+    </nav>
+  </div>
+
+  <main class="app-main">
+
+    <!-- ============ MENU INICIAL: escolher qual cálculo fazer ============ -->
+    <div id="menu-inicial">
+      <p class="intro-line">Escolha qual parte deseja calcular.</p>
+      <div class="menu-cards">
+        <button class="menu-card" id="menu-ambientais" type="button">
+          <h2>Fatores Ambientais</h2>
+          <p>Domínios e1 a e5 — barreiras do ambiente físico, social e de atitudes.</p>
+        </button>
+        <button class="menu-card" id="menu-participacao" type="button">
+          <h2>Atividades e Participação</h2>
+          <p>Domínios d1 a d9 — 16 anos ou mais, ou apenas a avaliação social (menores de 16).</p>
+        </button>
+      </div>
+    </div>
+
+    <!-- ============ CALCULADORA 1: Fatores Ambientais (e1 a e5) ============ -->
+    <div id="view-ambientais" hidden>
+      <section class="block" id="ambientais">
+        <!-- Botão "×" que volta ao menu -->
+        <button class="btn-fechar" id="voltar-ambientais" type="button" aria-label="Fechar e voltar">×</button>
+        <h2>Fatores Ambientais</h2>
+        <p class="sub">Qualificador final = [(e1+e2+e3+e4+e5) × 5] − 0,1</p>
+
+        <!-- Cada linha: código | nome do domínio | campo de 0 a 4.
+             Para um domínio novo, copie uma linha e troque id, código e nome. -->
+        <div class="domain-row">
+          <span class="code">e1</span>
+          <label for="e1" title="Produtos e Tecnologia">Produtos e Tecnologia</label>
+          <input type="number" id="e1" min="0" max="4" step="1" value="0" />
+        </div>
+        <div class="domain-row">
+          <span class="code">e2</span>
+          <label for="e2" title="Condições de Habitabilidade e Mudanças Ambientais">Condições de Habitabilidade</label>
+          <input type="number" id="e2" min="0" max="4" step="1" value="0" />
+        </div>
+        <div class="domain-row">
+          <span class="code">e3</span>
+          <label for="e3" title="Apoio e Relacionamentos">Apoio e Relacionamentos</label>
+          <input type="number" id="e3" min="0" max="4" step="1" value="0" />
+        </div>
+        <div class="domain-row">
+          <span class="code">e4</span>
+          <label for="e4" title="Atitudes">Atitudes</label>
+          <input type="number" id="e4" min="0" max="4" step="1" value="0" />
+        </div>
+        <div class="domain-row">
+          <span class="code">e5</span>
+          <label for="e5" title="Serviços, Sistemas e Políticas">Serviços, Sistemas e Políticas</label>
+          <input type="number" id="e5" min="0" max="4" step="1" value="0" />
+        </div>
+
+        <p class="scale-hint">Escala: 0 nenhuma · 1 leve · 2 moderada · 3 grave · 4 completa</p>
+
+        <div class="actions">
+          <button class="btn-calc" id="calc-ambientais" type="button">Calcular</button>
+          <button class="btn-clear" id="clear-ambientais" type="button">Limpar</button>
+        </div>
+
+        <!-- Caixa do resultado (aparece depois de calcular) -->
+        <div class="result" id="result-ambientais">
+          <div class="badge" id="badge-ambientais">–</div>
+          <div class="result-text">
+            <div class="pct" id="pct-ambientais">—</div>
+            <div class="desc" id="desc-ambientais">Preencha os domínios e calcule.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ CALCULADORA 2: Atividades e Participação (d1 a d9) ============ -->
+    <div id="view-participacao" hidden>
+      <section class="block" id="participacao">
+        <button class="btn-fechar" id="voltar-participacao" type="button" aria-label="Fechar e voltar">×</button>
+        <h2>Atividades e Participação</h2>
+
+        <!-- Abas: 16 anos ou mais (d1 a d9) / menores de 16 (só d6 a d9) -->
+        <div class="sub-tabs" role="tablist">
+          <button class="subtab-btn active" id="subtab-16mais" role="tab" aria-selected="true" type="button">16 anos ou mais</button>
+          <button class="subtab-btn" id="subtab-menor16" role="tab" aria-selected="false" type="button">Menores de 16</button>
+        </div>
+
+        <!-- Texto da fórmula (o app.js troca conforme a aba) -->
+        <p class="sub" id="sub-participacao">Qualificador final = [(d1+…+d9) × 2,77777777777778] − 0,1</p>
+
+        <!-- Grupo d1 a d5: escondido na aba "Menores de 16" -->
+        <div id="grupo-medico">
+          <div class="group-label">Avaliação médico-pericial</div>
+          <div class="domain-row">
+            <span class="code">d1</span>
+            <label for="d1" title="Aprendizagem e Aplicação de Conhecimento">Aprendizagem e Aplicação de Conhecimento</label>
+            <input type="number" id="d1" min="0" max="4" step="1" value="0" />
+          </div>
+          <div class="domain-row">
+            <span class="code">d2</span>
+            <label for="d2" title="Tarefas e Demandas Gerais">Tarefas e Demandas Gerais</label>
+            <input type="number" id="d2" min="0" max="4" step="1" value="0" />
+          </div>
+          <div class="domain-row">
+            <span class="code">d3</span>
+            <label for="d3" title="Comunicação">Comunicação</label>
+            <input type="number" id="d3" min="0" max="4" step="1" value="0" />
+          </div>
+          <div class="domain-row">
+            <span class="code">d4</span>
+            <label for="d4" title="Mobilidade">Mobilidade</label>
+            <input type="number" id="d4" min="0" max="4" step="1" value="0" />
+          </div>
+          <div class="domain-row">
+            <span class="code">d5</span>
+            <label for="d5" title="Cuidado Pessoal">Cuidado Pessoal</label>
+            <input type="number" id="d5" min="0" max="4" step="1" value="0" />
+          </div>
+        </div>
+
+        <!-- Grupo d6 a d9: sempre visível -->
+        <div class="group-label">Avaliação social</div>
+        <div class="domain-row">
+          <span class="code">d6</span>
+          <label for="d6" title="Vida Doméstica">Vida Doméstica</label>
+          <input type="number" id="d6" min="0" max="4" step="1" value="0" />
+        </div>
+        <div class="domain-row">
+          <span class="code">d7</span>
+          <label for="d7" title="Relações e Interações Interpessoais">Relações e Interações Interpessoais</label>
+          <input type="number" id="d7" min="0" max="4" step="1" value="0" />
+        </div>
+        <div class="domain-row">
+          <span class="code">d8</span>
+          <label for="d8" title="Áreas Principais da Vida">Áreas Principais da Vida</label>
+          <input type="number" id="d8" min="0" max="4" step="1" value="0" />
+        </div>
+        <div class="domain-row">
+          <span class="code">d9</span>
+          <label for="d9" title="Vida Comunitária, Social e Cívica">Vida Comunitária, Social e Cívica</label>
+          <input type="number" id="d9" min="0" max="4" step="1" value="0" />
+        </div>
+
+        <p class="scale-hint">Escala: 0 nenhuma · 1 leve · 2 moderada · 3 grave · 4 completa</p>
+
+        <div class="actions">
+          <button class="btn-calc" id="calc-participacao" type="button">Calcular</button>
+          <button class="btn-clear" id="clear-participacao" type="button">Limpar</button>
+        </div>
+
+        <div class="result" id="result-participacao">
+          <div class="badge" id="badge-participacao">–</div>
+          <div class="result-text">
+            <div class="pct" id="pct-participacao">—</div>
+            <div class="desc" id="desc-participacao">Preencha os domínios e calcule.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Rodapé com nota explicativa e faixas de classificação -->
+  <p class="app-footer">
+    <strong>Nota:</strong> os qualificadores por domínio (0–4) devem ser atribuídos pelo assistente
+    social e pelo perito médico com base no exame/estudo social, conforme os indicadores do
+    Anexo II. Esta ferramenta apenas automatiza o cálculo final previsto no Anexo IV. Faixas:
+    N 0–4% · L 5–24% · M 25–49% · G 50–95% · C 96–100%.
+  </p>
+
+</div>
+
+<script src="splash.js"></script>
+<script src="nav.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
